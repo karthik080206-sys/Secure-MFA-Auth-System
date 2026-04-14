@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import { authenticator } from "otplib";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import fs from "fs";
 
 dotenv.config();
 
@@ -29,8 +30,14 @@ declare module "express-session" {
 
 console.log("Starting server initialization...");
 
-// Initialize Sequelize with SQLite
-const dbPath = path.join(__dirname, "database.sqlite");
+// Persistent Database Path for Railway
+// To use this, add a Volume in Railway and mount it to /data
+const PERSISTENT_DIR = "/data";
+const dbPath = fs.existsSync(PERSISTENT_DIR) 
+  ? path.join(PERSISTENT_DIR, "database.sqlite") 
+  : path.join(__dirname, "database.sqlite");
+
+console.log(`[DB] Using database at: ${dbPath}`);
 
 const sequelize = new Sequelize({
   dialect: "sqlite",
@@ -290,6 +297,27 @@ app.use(session({
   });
 
   app.get("/dashboard", requireAuth, (req, res) => res.render("dashboard"));
+  
+  app.get("/resend-otp", async (req, res) => {
+    const userId = req.session.pendingUserId;
+    if (!userId || !req.session.appVerified) return res.redirect("/login");
+    
+    try {
+      const user = await User.findByPk(userId) as any;
+      if (!user) return res.redirect("/login");
+      
+      const emailOtp = Math.floor(100000 + Math.random() * 900000).toString();
+      req.session.emailOtp = emailOtp;
+      sendOTPEmail(user.email, emailOtp);
+      
+      req.session.save(() => {
+        res.render("verify-email", { success: "A new OTP has been sent to your email." });
+      });
+    } catch (error) {
+      res.render("verify-email", { error: "Failed to resend OTP." });
+    }
+  });
+
   app.get("/logout", (req, res) => req.session.destroy(() => res.redirect("/")));
   app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 

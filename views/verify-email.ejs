@@ -29,6 +29,12 @@
                     <%= error %>
                 </div>
             <% } %>
+
+            <% if (typeof success !== 'undefined') { %>
+                <div class="mb-6 p-4 bg-green-50 border border-green-200 text-green-600 text-sm rounded-xl">
+                    <%= success %>
+                </div>
+            <% } %>
             
             <form action="/verify-email" method="POST" class="space-y-6">
                 <div>
@@ -42,6 +48,10 @@
                     Complete Authentication
                 </button>
             </form>
+
+            <div class="mt-4 text-center">
+                <a href="/resend-otp" class="text-xs font-mono uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors">Resend OTP Email</a>
+            </div>
 
             <script>
                 document.querySelector('form').addEventListener('submit', function() {
