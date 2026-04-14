@@ -3,7 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { Sequelize, DataTypes, Op } from "sequelize";
 import session from "express-session";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { authenticator } from "otplib";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
@@ -117,39 +117,43 @@ async function sendOTPEmail(email: string, otp: string) {
 
 const app = express();
 
-async function initializeApp() {
-  // Sync Database
-  try {
-    await sequelize.authenticate();
-    console.log("Connection to SQLite has been established successfully.");
-    await sequelize.sync(); 
-    console.log("Database & tables created!");
-  } catch (error) {
-    console.error("Unable to connect to the database:", error);
-  }
-
-  const PORT = 3000;
-  app.set('trust proxy', 1);
-  app.set("view engine", "ejs");
-  app.set("views", path.join(__dirname, "views"));
-
-  app.use(express.urlencoded({ extended: true }));
-  app.use(express.json());
-  app.use(express.static(path.join(__dirname, "public")));
-  
-  app.use(session({
-    name: 'sid', 
-    secret: "secure-mfa-secret-key",
-    resave: true,
-    saveUninitialized: true,
-    proxy: true,
-    cookie: { 
-      secure: false,
-      maxAge: 60 * 60 * 1000,
-      httpOnly: true,
-      sameSite: 'lax'
+// Middleware to ensure DB is synced before handling requests
+let isDbSynced = false;
+app.use(async (req, res, next) => {
+  if (!isDbSynced) {
+    try {
+      await sequelize.sync();
+      isDbSynced = true;
+      console.log("Database synced successfully.");
+    } catch (error) {
+      console.error("Database sync failed:", error);
     }
-  }));
+  }
+  next();
+});
+
+const PORT = 3000;
+app.set('trust proxy', 1);
+app.set("view engine", "ejs");
+app.set("views", path.join(process.cwd(), "views"));
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.static(path.join(process.cwd(), "public")));
+
+app.use(session({
+  name: 'sid', 
+  secret: "secure-mfa-secret-key",
+  resave: true,
+  saveUninitialized: true,
+  proxy: true,
+  cookie: { 
+    secure: false,
+    maxAge: 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: 'lax'
+  }
+}));
 
   app.use((req, res, next) => {
     console.log(`[SESSION] Path: ${req.path}, Proto: ${req.headers['x-forwarded-proto']}, SessionID: ${req.sessionID}, Pending: ${req.session.pendingUserId}`);
@@ -280,9 +284,6 @@ async function initializeApp() {
   if (!isVercel) {
     app.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`));
   }
-}
-
-initializeApp().catch(console.error);
 
 export default app;
 
