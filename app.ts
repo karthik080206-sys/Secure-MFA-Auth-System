@@ -5,7 +5,7 @@ import { Sequelize, DataTypes, Op } from "sequelize";
 import session from "express-session";
 import bcrypt from "bcryptjs";
 import { authenticator } from "otplib";
-import nodemailer from "nodemailer";
+import * as Brevo from "@getbrevo/brevo";
 import dotenv from "dotenv";
 import fs from "fs";
 
@@ -80,36 +80,22 @@ const User = sequelize.define("User", {
   },
 });
 
-// Configure Nodemailer
-// Configure Nodemailer as per requirements
-console.log("Connecting to Gmail SMTP...");
-console.log("Using port 587");
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // IMPORTANT
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS ? process.env.SMTP_PASS.replace(/\s/g, "") : "",
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
+// Configure Brevo
+const brevoClient = new Brevo.BrevoClient({
+  apiKey: process.env.BREVO_API_KEY || "",
 });
 
 async function sendOTPEmail(email: string, otp: string) {
-  const mailOptions = {
-    from: process.env.SMTP_FROM || process.env.SMTP_USER,
-    to: email,
-    subject: "Your OTP Code",
-    text: `Your OTP is: ${otp}`,
-  };
-
   try {
-    await transporter.sendMail(mailOptions);
-    console.log("Email sent successfully");
+    await brevoClient.transactionalEmails.sendTransacEmail({
+      subject: "Your OTP Code",
+      textContent: `Your OTP is: ${otp}`,
+      sender: { email: process.env.SENDER_EMAIL || "karthik080206@gmail.com", name: "Secure Auth System" },
+      to: [{ email: email }],
+    });
+    console.log("Email sent successfully via Brevo");
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error("Error sending email via Brevo:", error);
   }
 }
 
