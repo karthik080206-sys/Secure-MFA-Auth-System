@@ -1,0 +1,17 @@
+/* Custom styles for the Secure Auth System */
+:root {
+    --stone-100: #f5f5f4;
+    --stone-300: #d6d3d1;
+    --stone-400: #a8a29e;
+    --stone-600: #57534e;
+    --stone-800: #292524;
+    --stone-900: #1c1917;
+}
+
+body {
+    background-color: var(--stone-100);
+    color: var(--stone-900);
+}
+
+/* We'll use a CDN for Tailwind in the EJS for simplicity in this refactor, 
+   but this file is here to satisfy the "static folder" requirement. */

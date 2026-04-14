@@ -1,0 +1,6 @@
+{
+  "name": "Secure MFA Auth System",
+  "description": "A secure authentication system with multi-factor authentication capabilities.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

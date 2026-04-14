@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Secure MFA Auth System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-stone-100 text-stone-900 font-sans min-h-screen flex flex-col">
+    <header class="border-b border-stone-300 p-6 bg-white">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-semibold tracking-tight"><a href="/">SECURE_AUTH_v1.0</a></h1>
+            <nav class="space-x-6 text-sm font-medium uppercase tracking-wider opacity-70">
+                <a href="/dashboard" class="hover:opacity-100 transition-opacity">Dashboard</a>
+                <a href="/logout" class="hover:opacity-100 transition-opacity">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-6">
+        <div class="max-w-4xl w-full">
+            <div class="mb-12">
+                <span class="text-[10px] font-mono uppercase tracking-[0.2em] text-stone-400 block mb-2">Authenticated Session</span>
+                <h2 class="text-5xl font-light leading-tight">Welcome to the Inner Circle, <%= user.username %></h2>
+                <p class="text-stone-400 text-lg mt-4 max-w-2xl">You have successfully navigated our multi-layered security protocol. Your identity has been verified through encrypted credentials, physical device authentication, and secure email verification.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white border border-stone-300 rounded-2xl p-6 shadow-sm">
+                    <h3 class="text-xs font-mono uppercase tracking-widest text-stone-400 mb-4">Security Level</h3>
+                    <div class="text-2xl font-light text-green-600">Level 3 (MFA+)</div>
+                    <p class="text-[10px] text-stone-400 mt-2">App + Email Verification active.</p>
+                </div>
+
+                <div class="bg-white border border-stone-300 rounded-2xl p-6 shadow-sm">
+                    <h3 class="text-xs font-mono uppercase tracking-widest text-stone-400 mb-4">Last Login</h3>
+                    <div class="text-2xl font-light">Just now</div>
+                    <p class="text-[10px] text-stone-400 mt-2">IP: 127.0.0.1 (Local Session)</p>
+                </div>
+
+                <div class="bg-white border border-stone-300 rounded-2xl p-6 shadow-sm">
+                    <h3 class="text-xs font-mono uppercase tracking-widest text-stone-400 mb-4">Account ID</h3>
+                    <div class="text-2xl font-light">#<%= user.id.toString().padStart(4, '0') %></div>
+                    <p class="text-[10px] text-stone-400 mt-2">Database Reference UID</p>
+                </div>
+            </div>
+
+            <div class="mt-12 bg-stone-900 text-white rounded-2xl p-8 flex justify-between items-center">
+                <div>
+                    <h3 class="text-xl font-light mb-2">Your account is protected</h3>
+                    <p class="text-stone-400 text-sm">Multi-Factor Authentication is currently securing your login sessions.</p>
+                </div>
+                <div class="flex items-center space-x-2 text-green-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    <span class="font-mono text-xs uppercase tracking-widest">Secured</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="p-6 border-t border-stone-300 text-[10px] font-mono uppercase tracking-widest text-stone-400 text-center">
+        &copy; 2026 SECURE_AUTH_SYSTEM // ENCRYPTED_CONNECTION
+    </footer>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - Secure MFA Auth System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-stone-100 text-stone-900 font-sans min-h-screen flex flex-col">
+    <header class="border-b border-stone-300 p-6 bg-white">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-semibold tracking-tight"><a href="/">SECURE_AUTH_v1.0</a></h1>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-6">
+        <div class="max-w-md w-full bg-white border border-stone-300 rounded-2xl p-8 shadow-sm text-center">
+            <div class="mb-6 text-red-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h2 class="text-2xl font-light mb-4">Security Error</h2>
+            <p class="text-stone-500 mb-8"><%= message %></p>
+            <a href="/" class="inline-block bg-stone-900 text-white rounded-xl px-8 py-3 font-medium hover:bg-stone-800 transition-colors">
+                Return Home
+            </a>
+        </div>
+    </main>
+
+    <footer class="p-6 border-t border-stone-300 text-[10px] font-mono uppercase tracking-widest text-stone-400 text-center">
+        &copy; 2026 SECURE_AUTH_SYSTEM // ENCRYPTED_CONNECTION
+    </footer>
+</body>
+</html>

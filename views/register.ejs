@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Secure MFA Auth System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-stone-100 text-stone-900 font-sans min-h-screen flex flex-col">
+    <header class="border-b border-stone-300 p-6 bg-white">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-semibold tracking-tight"><a href="/">SECURE_AUTH_v1.0</a></h1>
+            <nav class="space-x-6 text-sm font-medium uppercase tracking-wider opacity-70">
+                <a href="/" class="hover:opacity-100 transition-opacity">Home</a>
+                <% if (user) { %>
+                    <a href="/dashboard" class="hover:opacity-100 transition-opacity">Dashboard</a>
+                    <a href="/logout" class="hover:opacity-100 transition-opacity">Logout</a>
+                <% } else { %>
+                    <a href="/register" class="hover:opacity-100 transition-opacity">Register</a>
+                    <a href="/login" class="hover:opacity-100 transition-opacity">Login</a>
+                <% } %>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-6">
+        <div class="max-w-md w-full bg-white border border-stone-300 rounded-2xl p-8 shadow-sm">
+            <div class="mb-8">
+                <span class="text-[10px] font-mono uppercase tracking-[0.2em] text-stone-400 block mb-2">Registration Portal</span>
+                <h2 class="text-3xl font-light leading-tight">Create Account</h2>
+            </div>
+
+            <% if (typeof error !== 'undefined') { %>
+                <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl">
+                    <%= error %>
+                </div>
+            <% } %>
+
+            <% if (typeof success !== 'undefined') { %>
+                <div class="mb-6 p-4 bg-green-50 border border-green-200 text-green-600 text-sm rounded-xl">
+                    <%= success %>
+                    <% if (typeof mfaSecret !== 'undefined') { %>
+                        <div class="mt-4 p-4 bg-white border border-green-100 rounded-lg">
+                            <p class="text-[10px] font-mono uppercase tracking-widest text-stone-400 mb-2">MFA Setup Secret</p>
+                            <p class="text-lg font-mono text-stone-900 break-all"><%= mfaSecret %></p>
+                            <p class="mt-2 text-[10px] text-stone-500">Add this secret to your Authenticator app (Google, Authy, etc.) to generate login codes.</p>
+                        </div>
+                    <% } %>
+                    <p class="mt-4"><a href="/login" class="underline font-medium">Proceed to Login</a></p>
+                </div>
+            <% } %>
+            
+            <form action="/register" method="POST" class="space-y-6">
+                <div>
+                    <label for="username" class="block text-xs font-mono uppercase tracking-widest text-stone-400 mb-2">Username</label>
+                    <input type="text" id="username" name="username" required 
+                        class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-stone-900 transition-colors">
+                </div>
+
+                <div>
+                    <label for="email" class="block text-xs font-mono uppercase tracking-widest text-stone-400 mb-2">Email Address</label>
+                    <input type="email" id="email" name="email" required 
+                        class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-stone-900 transition-colors">
+                </div>
+
+                <div>
+                    <label for="mobileNumber" class="block text-xs font-mono uppercase tracking-widest text-stone-400 mb-2">Mobile Number</label>
+                    <input type="tel" id="mobileNumber" name="mobileNumber" required 
+                        class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-stone-900 transition-colors">
+                </div>
+
+                <div>
+                    <label for="password" class="block text-xs font-mono uppercase tracking-widest text-stone-400 mb-2">Password</label>
+                    <input type="password" id="password" name="password" required 
+                        class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:border-stone-900 transition-colors">
+                </div>
+
+                <button type="submit" class="w-full bg-stone-900 text-white rounded-xl py-3 font-medium hover:bg-stone-800 transition-colors">
+                    Register Account
+                </button>
+            </form>
+
+            <div class="mt-8 text-center">
+                <p class="text-sm text-stone-400">Already have an account? <a href="/login" class="text-stone-900 hover:underline">Sign in</a></p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="p-6 border-t border-stone-300 text-[10px] font-mono uppercase tracking-widest text-stone-400 text-center">
+        &copy; 2026 SECURE_AUTH_SYSTEM // ENCRYPTED_CONNECTION
+    </footer>
+</body>
+</html>
