@@ -82,19 +82,22 @@ const User = sequelize.define("User", {
 
 // Configure Nodemailer
 // Configure Nodemailer as per requirements
+console.log("Connecting to Gmail SMTP...");
+console.log("Using port 587");
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false, // IMPORTANT
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS ? process.env.SMTP_PASS.replace(/\s/g, "") : "",
   },
+  tls: {
+    rejectUnauthorized: false,
+  },
 });
 
 async function sendOTPEmail(email: string, otp: string) {
-  console.log("SMTP_USER:", process.env.SMTP_USER ? "OK" : "MISSING");
-  console.log("SMTP_PASS:", process.env.SMTP_PASS ? "OK" : "MISSING");
-  console.log("Step 3: Sending email to:", email);
-
   const mailOptions = {
     from: process.env.SMTP_FROM || process.env.SMTP_USER,
     to: email,
@@ -104,9 +107,9 @@ async function sendOTPEmail(email: string, otp: string) {
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log("Step 4: Email sent successfully");
+    console.log("Email sent successfully");
   } catch (error) {
-    console.error("Email error:", error);
+    console.error("Error sending email:", error);
   }
 }
 
@@ -212,9 +215,6 @@ app.use(session({
       if (!user || !(await bcrypt.compare(password, user.password))) {
         return res.render("login", { error: "Invalid credentials." });
       }
-      
-      console.log("Step 1: Password verified");
-      
       req.session.pendingUserId = user.id;
       req.session.appVerified = false;
       req.session.emailVerified = false;
@@ -223,10 +223,9 @@ app.use(session({
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       req.session.emailOtp = otp;
       
-      console.log("Step 2: OTP generated:", otp);
-      
-      // Wait for email to send before redirecting to ensure we catch errors
-      await sendOTPEmail(user.email, otp);
+      console.log("OTP generated:", otp);
+      console.log("Sending email to:", user.email);
+      sendOTPEmail(user.email, otp);
 
       req.session.save(() => res.redirect("/verify-app"));
     } catch (error) {
