@@ -1,20 +1,73 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# 🔐 Secure Authentication System (MFA-Based)
 
-# Run and deploy your AI Studio app
+## 📌 Overview
+This project is a **Secure Authentication System** that implements **Multi-Factor Authentication (MFA)** using Email OTP verification. It enhances security by adding an extra layer beyond traditional username and password login.
 
-This contains everything you need to run your app locally.
+---
 
-View your app in AI Studio: https://ai.studio/apps/ee37a099-f3e1-46d5-baa3-02a887cf3582
+## 🚀 Features
+- User Registration
+- Secure Login System
+- Password Hashing (Bcrypt)
+- Email OTP Verification (MFA)
+- Session Management
+- Protected Dashboard Access
+- Logout Functionality
 
-## Run Locally
+---
 
-**Prerequisites:**  Node.js
+## 🛠️ Tech Stack
+- **Backend:** Node.js, Express.js
+- **Database:** SQLite (Sequelize ORM)
+- **Authentication:** Sessions + Bcrypt
+- **Email Service:** Brevo API
+- **Deployment:** Railway
+
+---
+
+## 🔐 How It Works
+1. User logs in with email and password  
+2. System verifies credentials  
+3. OTP is generated  
+4. OTP is sent to user’s email  
+5. User enters OTP  
+6. Access is granted after verification  
+
+---
+
+## ⚙️ Environment Variables
+Create a `.env` file and add:
 
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+---
+
+## ▶️ Running the Project
+
+### Install dependencies
+
+### Start the server
+
+
+---
+
+## 🌐 Deployment
+The application is deployed on **Railway** and uses **Brevo API** for sending OTP emails.
+
+---
+
+## 📌 Future Enhancements
+- OTP Expiry Timer
+- Resend OTP Feature
+- Mobile OTP Integration
+- JWT Authentication
+- Improved UI/UX
+
+---
+
+## 👨‍💻 Author
+Developed as a project for implementing secure authentication using MFA.
+
+---
+
+## 📄 License
+This project is for educational purposes.
