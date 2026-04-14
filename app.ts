@@ -81,56 +81,30 @@ const User = sequelize.define("User", {
 });
 
 // Configure Nodemailer
-// Configure Nodemailer with more robust settings
+// Configure Nodemailer as per requirements
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // Use SSL
+  service: "gmail",
   auth: {
     user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS ? process.env.SMTP_PASS.replace(/\s/g, "") : "", // Remove spaces from App Password
+    pass: process.env.SMTP_PASS ? process.env.SMTP_PASS.replace(/\s/g, "") : "",
   },
-  connectionTimeout: 10000, // Increase timeout slightly
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
 });
 
 async function sendOTPEmail(email: string, otp: string) {
-  console.log(`[MFA] Attempting to send OTP email to: ${email}...`);
-  
-  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    console.warn("SMTP credentials not configured. Skipping email send.");
-    console.log(`[MOCK EMAIL] To: ${email}, OTP: ${otp}`);
-    return;
-  }
-
   const mailOptions = {
     from: process.env.SMTP_FROM || process.env.SMTP_USER,
     to: email,
-    subject: "Your Secure Login OTP",
-    text: `Your one-time password for login is: ${otp}. It will expire in 30 seconds.`,
-    html: `
-      <div style="font-family: sans-serif; padding: 20px; border: 1px solid #e5e7eb; border-radius: 12px; max-width: 500px;">
-        <h2 style="font-weight: 300; color: #111827;">Security Verification</h2>
-        <p style="color: #6b7280; font-size: 14px;">Please use the following code to complete your login:</p>
-        <div style="background: #f9fafb; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
-          <span style="font-family: monospace; font-size: 32px; letter-spacing: 8px; font-weight: bold; color: #111827;">${otp}</span>
-        </div>
-        <p style="color: #9ca3af; font-size: 10px; text-transform: uppercase; letter-spacing: 1px;">This code expires in 30 seconds.</p>
-      </div>
-    `,
+    subject: "Your OTP Code",
+    text: `Your OTP is: ${otp}`,
   };
 
-  // Fire and forget with enhanced logging
+  // Send email asynchronously
   transporter.sendMail(mailOptions)
-    .then((info) => {
-      console.log(`[MFA] SUCCESS: OTP email sent to ${email}. MessageId: ${info.messageId}`);
+    .then(() => {
+      console.log("Email sent successfully");
     })
     .catch(error => {
-      console.error(`[MFA] FAILED: Could not send email to ${email}. Error:`, error.message);
-      if (error.code === 'EAUTH') {
-        console.error("[MFA] AUTH ERROR: Please check if your Gmail App Password is correct and hasn't been revoked.");
-      }
+      console.error("Error sending email:", error);
     });
 }
 
@@ -239,6 +213,15 @@ app.use(session({
       req.session.pendingUserId = user.id;
       req.session.appVerified = false;
       req.session.emailVerified = false;
+
+      // Generate and send OTP immediately after password success
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      req.session.emailOtp = otp;
+      
+      console.log("OTP generated:", otp);
+      console.log("Sending email to:", user.email);
+      sendOTPEmail(user.email, otp);
+
       req.session.save(() => res.redirect("/verify-app"));
     } catch (error) {
       res.render("login", { error: "Login failed." });
@@ -260,9 +243,7 @@ app.use(session({
         return res.render("verify-app", { error: "Invalid code." });
       }
       req.session.appVerified = true;
-      const emailOtp = Math.floor(100000 + Math.random() * 900000).toString();
-      req.session.emailOtp = emailOtp;
-      sendOTPEmail(user.email, emailOtp);
+      // OTP was already sent in /login
       req.session.save(() => res.redirect("/verify-email"));
     } catch (error) {
       res.render("verify-app", { error: "Verification failed." });
