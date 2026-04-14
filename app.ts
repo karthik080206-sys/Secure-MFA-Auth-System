@@ -74,19 +74,23 @@ const User = sequelize.define("User", {
 });
 
 // Configure Nodemailer
+// Configure Nodemailer with more robust settings
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true, // Use SSL
   auth: {
     user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    pass: process.env.SMTP_PASS ? process.env.SMTP_PASS.replace(/\s/g, "") : "", // Remove spaces from App Password
   },
-  // Add connection timeout
-  connectionTimeout: 5000, 
-  greetingTimeout: 5000,
-  socketTimeout: 5000,
+  connectionTimeout: 10000, // Increase timeout slightly
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
 });
 
 async function sendOTPEmail(email: string, otp: string) {
+  console.log(`[MFA] Attempting to send OTP email to: ${email}...`);
+  
   if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
     console.warn("SMTP credentials not configured. Skipping email send.");
     console.log(`[MOCK EMAIL] To: ${email}, OTP: ${otp}`);
@@ -110,10 +114,17 @@ async function sendOTPEmail(email: string, otp: string) {
     `,
   };
 
-  // Fire and forget - don't await the email send to avoid hanging the user's browser
+  // Fire and forget with enhanced logging
   transporter.sendMail(mailOptions)
-    .then(() => console.log(`OTP email sent to ${email}`))
-    .catch(error => console.error("Error sending OTP email:", error));
+    .then((info) => {
+      console.log(`[MFA] SUCCESS: OTP email sent to ${email}. MessageId: ${info.messageId}`);
+    })
+    .catch(error => {
+      console.error(`[MFA] FAILED: Could not send email to ${email}. Error:`, error.message);
+      if (error.code === 'EAUTH') {
+        console.error("[MFA] AUTH ERROR: Please check if your Gmail App Password is correct and hasn't been revoked.");
+      }
+    });
 }
 
 const app = express();
