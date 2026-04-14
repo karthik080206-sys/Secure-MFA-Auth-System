@@ -80,6 +80,10 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  // Add connection timeout
+  connectionTimeout: 5000, 
+  greetingTimeout: 5000,
+  socketTimeout: 5000,
 });
 
 async function sendOTPEmail(email: string, otp: string) {
@@ -106,12 +110,10 @@ async function sendOTPEmail(email: string, otp: string) {
     `,
   };
 
-  try {
-    await transporter.sendMail(mailOptions);
-    console.log(`OTP email sent to ${email}`);
-  } catch (error) {
-    console.error("Error sending OTP email:", error);
-  }
+  // Fire and forget - don't await the email send to avoid hanging the user's browser
+  transporter.sendMail(mailOptions)
+    .then(() => console.log(`OTP email sent to ${email}`))
+    .catch(error => console.error("Error sending OTP email:", error));
 }
 
 const app = express();
@@ -242,7 +244,7 @@ app.use(session({
       req.session.appVerified = true;
       const emailOtp = Math.floor(100000 + Math.random() * 900000).toString();
       req.session.emailOtp = emailOtp;
-      await sendOTPEmail(user.email, emailOtp);
+      sendOTPEmail(user.email, emailOtp);
       req.session.save(() => res.redirect("/verify-email"));
     } catch (error) {
       res.render("verify-app", { error: "Verification failed." });
