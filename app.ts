@@ -30,8 +30,7 @@ declare module "express-session" {
 console.log("Starting server initialization...");
 
 // Initialize Sequelize with SQLite
-const isVercel = process.env.VERCEL === '1';
-const dbPath = isVercel ? "/tmp/database.sqlite" : path.join(__dirname, "database.sqlite");
+const dbPath = path.join(__dirname, "database.sqlite");
 
 const sequelize = new Sequelize({
   dialect: "sqlite",
@@ -132,14 +131,14 @@ app.use(async (req, res, next) => {
   next();
 });
 
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 app.set('trust proxy', 1);
 app.set("view engine", "ejs");
-app.set("views", path.join(process.cwd(), "views"));
+app.set("views", path.join(__dirname, "views"));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static(path.join(process.cwd(), "public")));
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use(session({
   name: 'sid', 
@@ -281,9 +280,9 @@ app.use(session({
   app.get("/logout", (req, res) => req.session.destroy(() => res.redirect("/")));
   app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 
-  if (!isVercel) {
-    app.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`));
-  }
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
 
 export default app;
 

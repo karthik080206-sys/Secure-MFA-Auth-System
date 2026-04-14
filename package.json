@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx app.ts",
+    "start": "tsx app.ts",
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
